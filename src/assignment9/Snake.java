@@ -5,13 +5,15 @@ import java.util.LinkedList;
 public class Snake {
 
 	private static final double SEGMENT_SIZE = 0.02;
-	private static final double MOVEMENT_SIZE = SEGMENT_SIZE * 1.5;
+	private static final double MOVEMENT_SIZE = SEGMENT_SIZE * 1.0;
 	private LinkedList<BodySegment> segments;
 	private double deltaX;
 	private double deltaY;
 	
 	public Snake() {
 		//FIXME - set up the segments instance variable
+		segments = new LinkedList<>();
+		segments.add(new BodySegment(0.5, 0.5, SEGMENT_SIZE));
 		deltaX = 0;
 		deltaY = 0;
 	}
@@ -38,6 +40,17 @@ public class Snake {
 	 */
 	public void move() {
 		//FIXME
+		for (int i = segments.size()-1; i>0; i--) {
+			BodySegment current = segments.get(i);
+			BodySegment previous = segments.get(i - 1);
+			current.setX(previous.getX());
+			current.setY(previous.getY());
+		}
+		
+		BodySegment head = segments.get(0);
+		head.setX(head.getX()+ deltaX);
+		head.setY(head.getY()+ deltaY);
+		
 	}
 	
 	/**
@@ -45,6 +58,9 @@ public class Snake {
 	 */
 	public void draw() {
 		//FIXME
+		for(BodySegment s:segments) {
+			s.draw();
+		}
 	}
 	
 	/**
@@ -54,6 +70,16 @@ public class Snake {
 	 */
 	public boolean eatFood(Food f) {
 		//FIXME
+		BodySegment head = segments.get(0);
+		double dx = head.getX() - f.getX();
+		double dy = head.getY() - f.getY();
+		double distance = Math.sqrt(dx*dx + dy*dy);
+		
+		if(distance < f.FOOD_SIZE + SEGMENT_SIZE) {
+			BodySegment tail = segments.get(segments.size() - 1);
+			segments.add(new BodySegment(tail.getX(), tail.getY(), SEGMENT_SIZE));
+			return true;
+		}
 		return false;
 	}
 	
@@ -63,6 +89,10 @@ public class Snake {
 	 */
 	public boolean isInbounds() {
 		//FIXME
-		return true;
+		BodySegment head = segments.get(0);
+		if(head.getX()-SEGMENT_SIZE >= 0 && head.getX() + SEGMENT_SIZE <= 1 && head.getY()-SEGMENT_SIZE >= 0 && head.getY() + SEGMENT_SIZE<=1) {
+			return true;
+		}
+		return false;
 	}
 }
